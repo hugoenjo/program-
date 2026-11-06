@@ -15,10 +15,10 @@ de elegir la mejor jugada posible.
 ## Fases del proyecto
 
 - [x] Fase 1: Representación e impresión del tablero
-- [x ] Fase 2: Reglas del juego
-- [x ] Fase 3: Juego para dos personas
-- [X ] Fase 4: Máquina con movimientos aleatorios
-- [X ] Fase 5: Inteligencia artificial con Minimax
+- [x] Fase 2: Reglas del juego
+- [x] Fase 3: Juego para dos personas
+- [x] Fase 4: Máquina con movimientos aleatorios
+- [x] Fase 5: Inteligencia artificial con Minimax
 
 ## Tecnologías
 
