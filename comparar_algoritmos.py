@@ -13,6 +13,10 @@ COMBINACIONES_GANADORAS = (
     (0, 4, 8), (2, 4, 6),
 )
 
+CENTRO = (4,)
+ESQUINAS = (0, 2, 6, 8)
+LATERALES = (1, 3, 5, 7)
+
 
 def hay_ganador(tablero):
     for a, b, c in COMBINACIONES_GANADORAS:
@@ -23,6 +27,41 @@ def hay_ganador(tablero):
 
 def hay_empate(tablero):
     return " " not in tablero and hay_ganador(tablero) is None
+
+
+def ordenar_movimientos(tablero, jugador):
+    """Prioriza ganar, bloquear, centro, esquinas y finalmente laterales."""
+    rival = "X" if jugador == "O" else "O"
+    movimientos = []
+
+    for posicion in range(9):
+        if tablero[posicion] != " ":
+            continue
+
+        # Una victoria inmediata siempre tiene la máxima prioridad.
+        tablero[posicion] = jugador
+        gana = hay_ganador(tablero) == jugador
+        tablero[posicion] = " "
+        if gana:
+            prioridad = 0
+        else:
+            # Si el rival ganaría ocupando esta casilla, conviene bloquear.
+            tablero[posicion] = rival
+            rival_gana = hay_ganador(tablero) == rival
+            tablero[posicion] = " "
+            if rival_gana:
+                prioridad = 1
+            elif posicion in CENTRO:
+                prioridad = 2
+            elif posicion in ESQUINAS:
+                prioridad = 3
+            else:
+                prioridad = 4
+
+        movimientos.append((prioridad, posicion))
+
+    movimientos.sort()
+    return [posicion for _, posicion in movimientos]
 
 
 def minimax(tablero, maximizando, profundidad, contador):
@@ -58,7 +97,7 @@ def minimax(tablero, maximizando, profundidad, contador):
 
 
 def minimax_alfa_beta(tablero, maximizando, profundidad, alpha, beta, contador):
-    """Minimax con poda: descarta ramas que no pueden cambiar la decisión."""
+    """Minimax con poda y ordenación heurística de movimientos."""
     contador[0] += 1
     ganador = hay_ganador(tablero)
 
@@ -69,35 +108,36 @@ def minimax_alfa_beta(tablero, maximizando, profundidad, alpha, beta, contador):
     if hay_empate(tablero):
         return 0
 
+    jugador = "O" if maximizando else "X"
+    movimientos = ordenar_movimientos(tablero, jugador)
+
     if maximizando:
         mejor = float("-inf")
-        for posicion in range(9):
-            if tablero[posicion] == " ":
-                tablero[posicion] = "O"
-                puntuacion = minimax_alfa_beta(
-                    tablero, False, profundidad + 1, alpha, beta, contador
-                )
-                tablero[posicion] = " "
-                mejor = max(mejor, puntuacion)
-                alpha = max(alpha, mejor)
-
-                if beta <= alpha:
-                    break
-        return mejor
-
-    mejor = float("inf")
-    for posicion in range(9):
-        if tablero[posicion] == " ":
-            tablero[posicion] = "X"
+        for posicion in movimientos:
+            tablero[posicion] = "O"
             puntuacion = minimax_alfa_beta(
-                tablero, True, profundidad + 1, alpha, beta, contador
+                tablero, False, profundidad + 1, alpha, beta, contador
             )
             tablero[posicion] = " "
-            mejor = min(mejor, puntuacion)
-            beta = min(beta, mejor)
+            mejor = max(mejor, puntuacion)
+            alpha = max(alpha, mejor)
 
             if beta <= alpha:
                 break
+        return mejor
+
+    mejor = float("inf")
+    for posicion in movimientos:
+        tablero[posicion] = "X"
+        puntuacion = minimax_alfa_beta(
+            tablero, True, profundidad + 1, alpha, beta, contador
+        )
+        tablero[posicion] = " "
+        mejor = min(mejor, puntuacion)
+        beta = min(beta, mejor)
+
+        if beta <= alpha:
+            break
     return mejor
 
 
@@ -107,22 +147,26 @@ def mejor_jugada(algoritmo, tablero):
     mejor_puntuacion = float("-inf")
     contador = [0]
 
-    for posicion in range(9):
-        if tablero[posicion] == " ":
-            tablero[posicion] = "O"
+    if algoritmo == "minimax":
+        movimientos = [p for p in range(9) if tablero[p] == " "]
+    else:
+        movimientos = ordenar_movimientos(tablero, "O")
 
-            if algoritmo == "minimax":
-                puntuacion = minimax(tablero, False, 1, contador)
-            else:
-                puntuacion = minimax_alfa_beta(
-                    tablero, False, 1, float("-inf"), float("inf"), contador
-                )
+    for posicion in movimientos:
+        tablero[posicion] = "O"
 
-            tablero[posicion] = " "
+        if algoritmo == "minimax":
+            puntuacion = minimax(tablero, False, 1, contador)
+        else:
+            puntuacion = minimax_alfa_beta(
+                tablero, False, 1, float("-inf"), float("inf"), contador
+            )
 
-            if puntuacion > mejor_puntuacion:
-                mejor_puntuacion = puntuacion
-                mejor_posicion = posicion
+        tablero[posicion] = " "
+
+        if puntuacion > mejor_puntuacion:
+            mejor_puntuacion = puntuacion
+            mejor_posicion = posicion
 
     return mejor_posicion, mejor_puntuacion, contador[0]
 
@@ -143,15 +187,16 @@ def ejecutar_prueba(nombre, algoritmo, tablero):
 
 
 def main():
-    # Tablero vacío: O empieza y busca su mejor primera jugada.
     tablero = [" "] * 9
 
     print("COMPARACIÓN DE ALGORITMOS - TRES EN RAYA")
     print("=" * 43)
-    print("Posición inicial: tablero vacío\n")
+    print("Posición inicial: tablero vacío\\n")
 
     resultado_minimax = ejecutar_prueba("MINIMAX", "minimax", tablero)
-    resultado_poda = ejecutar_prueba("MINIMAX CON PODA ALFA-BETA", "alfa_beta", tablero)
+    resultado_poda = ejecutar_prueba(
+        "MINIMAX + ALFA-BETA + ORDENACIÓN", "alfa_beta", tablero
+    )
 
     puntuacion_igual = resultado_minimax[0] == resultado_poda[0]
     reduccion = (1 - resultado_poda[1] / resultado_minimax[1]) * 100
@@ -161,7 +206,7 @@ def main():
     print(f"¿Misma puntuación óptima?: {'Sí' if puntuacion_igual else 'No'}")
     print(f"Reducción de nodos:         {reduccion:.2f}%")
     print(f"Factor de nodos:            {resultado_minimax[1] / resultado_poda[1]:.2f}x")
-    print("\nNota: el tiempo puede variar según el ordenador y la carga del sistema.")
+    print("\\nNota: el tiempo puede variar según el ordenador y la carga del sistema.")
 
 
 if __name__ == "__main__":
