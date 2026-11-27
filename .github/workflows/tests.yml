@@ -1,0 +1,22 @@
+name: Tests Minimax
+on:
+  push:
+    branches:
+      - mejora-alfa-beta
+  workflow_dispatch:
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Comprobar sintaxis
+        run: python -m py_compile main.py comparar_algoritmos.py test_minimax.py
+      - name: Ejecutar pruebas
+        run: python -m unittest -v
+      - name: Comparar algoritmos
+        run: python comparar_algoritmos.py
