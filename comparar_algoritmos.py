@@ -64,7 +64,7 @@ def main():
     print(f"  Mejor casilla: {posicion + 1}")
     print(f"  Puntuación:    {puntuacion}")
     print(f"  Nodos:         {nodos:,}")
-    print(f"  Tiempo:        {tiempo:.6f} s\\n")
+    print(f"  Tiempo:        {tiempo:.6f} s\n")
 
     inicio = perf_counter()
     posicion_optima, estadisticas = mejor_movimiento(
@@ -78,7 +78,7 @@ def main():
     print(f"  Nodos:         {estadisticas['nodos']:,}")
     print(f"  Podas:         {estadisticas['podas']:,}")
     print(f"  Aciertos memoria: {estadisticas['aciertos_memoria']:,}")
-    print(f"  Tiempo:        {tiempo_optimo:.6f} s\\n")
+    print(f"  Tiempo:        {tiempo_optimo:.6f} s\n")
 
     reduccion = (1 - estadisticas["nodos"] / nodos) * 100
     misma_puntuacion = puntuacion == estadisticas["puntuacion"]
@@ -87,7 +87,7 @@ def main():
     print("-" * 42)
     print(f"¿Misma puntuación óptima?: {'Sí' if misma_puntuacion else 'No'}")
     print(f"Reducción de nodos:         {reduccion:.2f}%")
-    print("\\nLos tiempos dependen del ordenador y de la carga del sistema.")
+    print("\nLos tiempos dependen del ordenador y de la carga del sistema.")
 
 
 if __name__ == "__main__":
