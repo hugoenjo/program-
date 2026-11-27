@@ -93,7 +93,7 @@ class PruebasMinimaxOptimizado(unittest.TestCase):
             cantidad += 1
 
         self.assertGreater(cantidad, 0)
-        print(f"\\nPosiciones legales comprobadas: {cantidad}")
+        print(f"\nPosiciones legales comprobadas: {cantidad}")
 
     def test_ia_puede_forzar_al_menos_empate_con_cualquier_salida_humana(self):
         from main import mejor_movimiento
