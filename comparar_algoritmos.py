@@ -191,7 +191,7 @@ def main():
 
     print("COMPARACIÓN DE ALGORITMOS - TRES EN RAYA")
     print("=" * 43)
-    print("Posición inicial: tablero vacío\\n")
+    print("Posición inicial: tablero vacío\n")
 
     resultado_minimax = ejecutar_prueba("MINIMAX", "minimax", tablero)
     resultado_poda = ejecutar_prueba(
@@ -206,7 +206,7 @@ def main():
     print(f"¿Misma puntuación óptima?: {'Sí' if puntuacion_igual else 'No'}")
     print(f"Reducción de nodos:         {reduccion:.2f}%")
     print(f"Factor de nodos:            {resultado_minimax[1] / resultado_poda[1]:.2f}x")
-    print("\\nNota: el tiempo puede variar según el ordenador y la carga del sistema.")
+    print("\nNota: el tiempo puede variar según el ordenador y la carga del sistema.")
 
 
 if __name__ == "__main__":
