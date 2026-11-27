@@ -219,6 +219,7 @@ def mejor_movimiento(tablero, devolver_estadisticas=False):
         alpha = max(alpha, mejor_puntuacion)
 
     if devolver_estadisticas:
+        estadisticas["puntuacion"] = mejor_puntuacion
         return mejor_posicion, estadisticas
     return mejor_posicion
 
