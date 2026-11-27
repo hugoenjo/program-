@@ -95,13 +95,25 @@ class PruebasMinimaxOptimizado(unittest.TestCase):
         self.assertGreater(cantidad, 0)
         print(f"\\nPosiciones legales comprobadas: {cantidad}")
 
-    def test_ia_no_pierde_desde_el_tablero_vacio(self):
+    def test_ia_puede_forzar_al_menos_empate_con_cualquier_salida_humana(self):
         from main import mejor_movimiento
 
-        tablero = [" "] * 9
-        posicion = mejor_movimiento(tablero)
-        self.assertIsNotNone(posicion)
-        self.assertEqual(tablero, [" "] * 9)
+        # X empieza. Para cada una de sus nueve posibles salidas,
+        # comprobamos que la respuesta óptima de O no permite una derrota.
+        for primera_jugada_x in range(9):
+            tablero = [" "] * 9
+            tablero[primera_jugada_x] = "X"
+
+            posicion_o = mejor_movimiento(tablero)
+            self.assertIsNotNone(posicion_o)
+            tablero[posicion_o] = "O"
+
+            resultado = minimax_referencia(tablero, False, 2)
+            self.assertGreaterEqual(
+                resultado,
+                0,
+                msg=f"La IA podría perder tras la salida X en {primera_jugada_x + 1}",
+            )
 
 
 if __name__ == "__main__":
